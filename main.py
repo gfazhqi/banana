@@ -24,8 +24,8 @@ async def main():
             await ban.get_lottery_info(session, token)
             await ban.get_banana_list(session, token)
 
-        print_timestamp(f"{Fore.CYAN + Style.BRIGHT}[ Restarting All Account ]{Style.RESET_ALL}")
-        await asyncio.sleep(3 * 3600)
+        print_timestamp(f"{Fore.CYAN + Style.BRIGHT}[ Restarting Soon ]{Style.RESET_ALL}")
+        await asyncio.sleep(4 * 3600)
 
 
 if __name__ == '__main__':
