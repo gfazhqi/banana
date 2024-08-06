@@ -69,11 +69,11 @@ async def get_lottery_info(session, token: str):
             minutes, seconds = divmod(remainder, 60)
             print_timestamp(f"{Fore.BLUE + Style.BRIGHT}[ Claim Your Banana In {int(hours)} Hours {int(minutes)} Minutes {int(seconds)} Seconds ]{Style.RESET_ALL}")
         else:
-            claim_lottery = await claim_lottery(session, token, lottery_type=1)
-            if claim_lottery['msg'] == "Success":
+            claim_lot = await claim_lottery(session, token, lottery_type=1)
+            if claim_lot['msg'] == "Success":
                 print_timestamp(f"{Fore.GREEN + Style.BRIGHT}[ Lottery Claimed 🍌 ]{Style.RESET_ALL}")
             else:
-                print_timestamp(f"{Fore.RED + Style.BRIGHT}[ {claim_lottery['msg']} ]{Style.RESET_ALL}")
+                print_timestamp(f"{Fore.RED + Style.BRIGHT}[ {claim_lot['msg']} ]{Style.RESET_ALL}")
         
         get_lottery = await get_user_info(session, token)
         harvest = get_lottery['data']['lottery_info']['remain_lottery_count']
@@ -130,8 +130,8 @@ async def get_banana_list(session, token: str):
         response.raise_for_status()
         get_banana = await response.json()
         filtered_banana_list = [banana for banana in get_banana['data']['banana_list'] if banana['count'] >= 1]
-        highest_banana = max(filtered_banana_list, key=lambda x: x['banana_id'])
-        if highest_banana['banana_id'] > get_user['data']['equip_banana']['banana_id']:
+        highest_banana = max(filtered_banana_list, key=lambda x: x['daily_peel_limit'])
+        if highest_banana['daily_peel_limit'] > get_user['data']['equip_banana']['daily_peel_limit']:
             print_timestamp(f"{Fore.MAGENTA + Style.BRIGHT}[ Equipping Banana ]{Style.RESET_ALL}")
             equip_banana = await do_equip(session, token, highest_banana['banana_id'])
             if equip_banana['msg'] == "Success":
@@ -190,9 +190,7 @@ async def do_sell(session, token: str, banana_id: int, sell_count: int):
         return await response.json()
 
 async def main():
-    init(autoreset=True)
     tokens = [line.strip() for line in open('tokens.txt', 'r').readlines()]
-
     async with aiohttp.ClientSession() as session:
         for token in tokens:
             get_user = await get_user_info(session, token)
@@ -207,11 +205,12 @@ async def main():
             await get_banana_list(session, token)
     
         print_timestamp(f"{Fore.CYAN + Style.BRIGHT}[ Restarting Soon ]{Style.RESET_ALL}")
-        await asyncio.sleep(3 * 3600)
+        await asyncio.sleep((8 * 3600) + 10)
 
 if __name__ == '__main__':
     while True:
         try:
+            init(autoreset=True)
             asyncio.run(main())
         except (Exception, aiohttp.ClientResponseError) as e:
             print_timestamp(f"{Fore.RED + Style.BRIGHT}[ {str(e)} ]{Style.RESET_ALL}")
